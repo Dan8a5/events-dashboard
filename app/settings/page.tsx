@@ -3,6 +3,7 @@ import { DashboardHeader } from "@/components/dashboard-header"
 import { ProjectForm } from "@/components/project-form"
 import { ProjectCard } from "@/components/project-card"
 import { LoadDemoData } from "@/components/load-demo-data"
+import { MetalsSync } from "@/components/metals-sync"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Project } from "@/lib/types"
 import { headers } from "next/headers"
@@ -43,6 +44,8 @@ export default async function SettingsPage() {
           </div>
 
           <LoadDemoData />
+
+          <MetalsSync />
 
           <Card>
             <CardHeader>

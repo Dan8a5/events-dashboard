@@ -21,6 +21,12 @@ const channelColorMap: Record<string, string> = {
   alerts: "#ef4444",      // red
   metrics: "#3b82f6",     // blue
   
+  // Metals
+  gold: "#f59e0b",        // amber
+  silver: "#94a3b8",      // slate
+  platinum: "#e2e8f0",    // light slate
+  palladium: "#a78bfa",   // violet
+
   // General
   system: "#64748b",      // slate
   notifications: "#f97316", // orange
