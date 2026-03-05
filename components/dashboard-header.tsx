@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Settings, Activity, Book } from "lucide-react"
+import { Settings, Activity, Book, TrendingUp } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export function DashboardHeader() {
@@ -12,6 +12,12 @@ export function DashboardHeader() {
           <h1 className="text-xl font-semibold text-foreground">Events</h1>
         </Link>
         <nav className="flex items-center gap-1">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/metals">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Metals
+            </Link>
+          </Button>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/docs">
               <Book className="h-4 w-4 mr-2" />
