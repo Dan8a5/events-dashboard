@@ -110,6 +110,7 @@ export function DashboardContent({
 
       <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
         <EventFeed
+          key={`${selectedProjectId}-${dateRange}`}
           initialEvents={filteredEvents}
           channels={filteredChannels}
           projectMap={projectMap}
