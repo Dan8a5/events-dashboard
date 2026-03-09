@@ -9,16 +9,18 @@ import {
 } from "@/components/ui/select"
 import { Clock } from "lucide-react"
 
+export type DateRange = "all" | "24h" | "7d" | "30d"
+
 interface DateRangeFilterProps {
-  value: string
-  onChange: (v: string) => void
+  value: DateRange
+  onChange: (v: DateRange) => void
 }
 
 export function DateRangeFilter({ value, onChange }: DateRangeFilterProps) {
   return (
     <div className="flex items-center gap-3">
       <Clock className="h-5 w-5 text-muted-foreground" />
-      <Select value={value} onValueChange={onChange}>
+      <Select value={value} onValueChange={(v) => onChange(v as DateRange)}>
         <SelectTrigger className="w-[160px]">
           <SelectValue />
         </SelectTrigger>
