@@ -6,6 +6,7 @@ import { EventFeed } from "@/components/event-feed"
 import { ActivityChart } from "@/components/activity-chart"
 import { KpiCards } from "@/components/kpi-cards"
 import { ProjectSelector } from "@/components/project-selector"
+import { DateRangeFilter } from "@/components/date-range-filter"
 import { createClient } from "@/lib/supabase/client"
 
 interface DashboardContentProps {
@@ -22,6 +23,7 @@ export function DashboardContent({
   const [events, setEvents] = useState<Event[]>(initialEvents)
   const [channels, setChannels] = useState<string[]>(initialChannels)
   const [selectedProjectId, setSelectedProjectId] = useState<string>("all")
+  const [dateRange, setDateRange] = useState<string>("all")
 
   // Set up real-time subscription for KPI updates
   useEffect(() => {
@@ -53,11 +55,17 @@ export function DashboardContent({
     }
   }, [channels])
 
-  // Filter events by selected project
   const filteredEvents = useMemo(() => {
-    if (selectedProjectId === "all") return events
-    return events.filter(e => e.project_id === selectedProjectId)
-  }, [events, selectedProjectId])
+    let result = selectedProjectId === "all" ? events : events.filter(e => e.project_id === selectedProjectId)
+
+    if (dateRange !== "all") {
+      const hours = dateRange === "24h" ? 24 : dateRange === "7d" ? 7 * 24 : 30 * 24
+      const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000)
+      result = result.filter(e => new Date(e.created_at) >= cutoff)
+    }
+
+    return result
+  }, [events, selectedProjectId, dateRange])
 
   // Get channels for filtered events
   const filteredChannels = useMemo(() => {
@@ -75,16 +83,12 @@ export function DashboardContent({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <ProjectSelector 
+        <ProjectSelector
           projects={projects}
           selectedProjectId={selectedProjectId}
           onProjectChange={setSelectedProjectId}
         />
-        {selectedProjectId !== "all" && (
-          <p className="text-sm text-muted-foreground">
-            Showing events from {projects.find(p => p.id === selectedProjectId)?.name}
-          </p>
-        )}
+        <DateRangeFilter value={dateRange} onChange={setDateRange} />
       </div>
       
       <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
