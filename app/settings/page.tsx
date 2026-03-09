@@ -29,7 +29,7 @@ export default async function SettingsPage() {
     console.error("Error fetching projects:", error)
   }
 
-  const projectList: Project[] = projects || []
+  const projectList: Project[] = (projects || []).filter(p => p.name !== "Metals Tracker")
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

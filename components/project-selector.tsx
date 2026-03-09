@@ -34,7 +34,7 @@ export function ProjectSelector({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Projects</SelectItem>
-          {projects.map((project) => (
+          {projects.filter(p => p.name !== "Metals Tracker").map((project) => (
             <SelectItem key={project.id} value={project.id}>
               {project.name}
             </SelectItem>

@@ -31,6 +31,11 @@ export function EventFeed({
 }: EventFeedProps) {
   const [events, setEvents] = useState<Event[]>(initialEvents)
   const [searchQuery, setSearchQuery] = useState("")
+
+  // Sync local state when the parent project filter changes
+  useEffect(() => {
+    setEvents(initialEvents)
+  }, [initialEvents])
   const [selectedChannel, setSelectedChannel] = useState<string>("all")
   const [pageSize, setPageSize] = useState<string>("50")
   const [currentPage, setCurrentPage] = useState(1)

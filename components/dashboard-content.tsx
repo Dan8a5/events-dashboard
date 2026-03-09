@@ -5,6 +5,7 @@ import type { Event, Project } from "@/lib/types"
 import { EventFeed } from "@/components/event-feed"
 import { ActivityChart } from "@/components/activity-chart"
 import { KpiCards } from "@/components/kpi-cards"
+import { ChannelBreakdownChart } from "@/components/channel-breakdown-chart"
 import { ProjectSelector } from "@/components/project-selector"
 import { createClient } from "@/lib/supabase/client"
 
@@ -96,6 +97,7 @@ export function DashboardContent({
         />
         <div className="space-y-6">
           <KpiCards events={filteredEvents} />
+          <ChannelBreakdownChart events={filteredEvents} />
           <ActivityChart events={filteredEvents} />
         </div>
       </div>
