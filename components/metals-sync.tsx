@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, CheckCircle, RefreshCw, TrendingUp } from "lucide-react"
+import { syncMetalsAction } from "@/app/actions/sync-metals"
 
 interface SyncResult {
   eventsCreated?: number
@@ -13,24 +14,17 @@ interface SyncResult {
 }
 
 export function MetalsSync() {
-  const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<SyncResult | null>(null)
+  const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
-  const handleSync = async () => {
-    setLoading(true)
-    setResult(null)
-
-    try {
-      const res = await fetch("/api/metals-sync", { method: "POST" })
-      const data = await res.json()
-      setResult(data)
-      if (res.ok) router.refresh()
-    } catch {
-      setResult({ error: "Network error — could not reach the sync endpoint" })
-    } finally {
-      setLoading(false)
-    }
+  const handleSync = () => {
+    startTransition(async () => {
+      setResult(null)
+      const data = await syncMetalsAction()
+      setResult(data as SyncResult)
+      if ("success" in data && data.success) router.refresh()
+    })
   }
 
   return (
@@ -88,8 +82,8 @@ export function MetalsSync() {
               </span>
             ))}
           </div>
-          <Button onClick={handleSync} disabled={loading} size="sm" className="w-full">
-            {loading ? (
+          <Button onClick={handleSync} disabled={isPending} size="sm" className="w-full">
+            {isPending ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Syncing...

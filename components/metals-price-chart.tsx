@@ -54,7 +54,7 @@ export function MetalsPriceChart({ events, hasProject }: MetalsPriceChartProps) 
         .find((p) => p !== null) ?? null
 
       const change24h = currentPrice !== null && oldest24h !== null ? currentPrice - oldest24h : null
-      const changePct24h = change24h !== null && oldest24h ? (change24h / oldest24h) * 100 : null
+      const changePct24h = change24h !== null && oldest24h !== null && oldest24h !== 0 ? (change24h / oldest24h) * 100 : null
 
       return { ...metal, chartData, currentPrice, change24h, changePct24h }
     })
@@ -167,7 +167,7 @@ export function MetalsPriceChart({ events, hasProject }: MetalsPriceChartProps) 
                     <ChartTooltip
                       content={
                         <ChartTooltipContent
-                          formatter={(value) => [`$${Number(value).toFixed(2)}`, "Price"]}
+                          formatter={(value) => `Price: $${Number(value).toFixed(2)}`}
                         />
                       }
                     />
