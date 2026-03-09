@@ -5,13 +5,16 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, CheckCircle, FlaskConical } from "lucide-react"
+import { Loader2, CheckCircle, AlertCircle, FlaskConical } from "lucide-react"
 import type { Project } from "@/lib/types"
+
+// Excluded from seeding because it is a live data project, not a test project.
+const EXCLUDED_SEED_PROJECT_NAME = "Metals Tracker"
 
 const COUNTS = [25, 50, 100, 250]
 
 export function SeedEvents({ projects }: { projects: Project[] }) {
-  const filtered = projects.filter((p) => p.name !== "Metals Tracker")
+  const filtered = projects.filter((p) => p.name !== EXCLUDED_SEED_PROJECT_NAME)
   const [projectId, setProjectId] = useState("")
   const [count, setCount] = useState("50")
   const [loading, setLoading] = useState(false)
@@ -63,7 +66,11 @@ export function SeedEvents({ projects }: { projects: Project[] }) {
               ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30"
               : "text-destructive bg-destructive/10"
           }`}>
-            <CheckCircle className="h-4 w-4" />
+            {message.type === "success" ? (
+              <CheckCircle className="h-4 w-4" />
+            ) : (
+              <AlertCircle className="h-4 w-4" />
+            )}
             <span>{message.text}</span>
           </div>
         )}

@@ -23,8 +23,13 @@ export async function POST(request: Request) {
   try {
     const { projectId, count } = await request.json()
 
-    if (!projectId || !count) {
+    const allowedCounts = [25, 50, 100, 250]
+    if (!projectId || count === undefined || count === null) {
       return NextResponse.json({ error: "Missing projectId or count" }, { status: 400 })
+    }
+
+    if (typeof count !== "number" || !Number.isInteger(count) || !allowedCounts.includes(count)) {
+      return NextResponse.json({ error: "Invalid count. Allowed values are 25, 50, 100, or 250." }, { status: 400 })
     }
 
     const supabase = createAdminClient()
