@@ -5,7 +5,7 @@ const TEMPLATES = [
   { channel: "auth", title: "User logged in", icon: "🔐" },
   { channel: "auth", title: "Password reset requested", icon: "🔑" },
   { channel: "auth", title: "New session started", icon: "✅" },
-  { channel: "payments", title: "Payment processed", icon: "💳", description: "Amount: $XX.XX" },
+  { channel: "payments", title: "Payment processed", icon: "💳" },
   { channel: "payments", title: "Subscription renewed", icon: "🔄" },
   { channel: "payments", title: "Refund issued", icon: "↩️" },
   { channel: "errors", title: "500 Internal Server Error", icon: "🔴", tags: ["critical"] },
@@ -36,12 +36,16 @@ export async function POST(request: Request) {
 
     const { data: project } = await supabase
       .from("projects")
-      .select("id")
+      .select("id, name")
       .eq("id", projectId)
       .single()
 
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
+    }
+
+    if (project.name === "Metals Tracker") {
+      return NextResponse.json({ error: "Cannot seed events into this project" }, { status: 403 })
     }
 
     const events = Array.from({ length: count }, () => {
