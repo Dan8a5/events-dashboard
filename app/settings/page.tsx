@@ -3,9 +3,11 @@ import { DashboardHeader } from "@/components/dashboard-header"
 import { ProjectForm } from "@/components/project-form"
 import { ProjectCard } from "@/components/project-card"
 import { LoadDemoData } from "@/components/load-demo-data"
+import { MetalsSync } from "@/components/metals-sync"
 import { SeedEvents } from "@/components/seed-events"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Project } from "@/lib/types"
+import { METALS_PROJECT_NAME } from "@/lib/constants"
 import { headers } from "next/headers"
 
 export const dynamic = "force-dynamic"
@@ -13,7 +15,7 @@ export const dynamic = "force-dynamic"
 export default async function SettingsPage() {
   const supabase = await createClient()
   const headersList = await headers()
-  
+
   // Get the host for the API URL
   const host = headersList.get("host") || "localhost:3000"
   const protocol = host.includes("localhost") ? "http" : "https"
@@ -29,7 +31,7 @@ export default async function SettingsPage() {
     console.error("Error fetching projects:", error)
   }
 
-  const projectList: Project[] = projects || []
+  const projectList: Project[] = (projects || []).filter(p => p.name !== METALS_PROJECT_NAME)
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -44,6 +46,8 @@ export default async function SettingsPage() {
           </div>
 
           <LoadDemoData />
+
+          <MetalsSync />
 
           <SeedEvents projects={projectList} />
 
