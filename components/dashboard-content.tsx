@@ -62,18 +62,19 @@ export function DashboardContent({
     }
   }, [channels])
 
-  // Tick every minute so date-range cutoffs stay current
+  // Tick every minute so date-range cutoffs stay current for non-"all" ranges
   useEffect(() => {
+    if (dateRange === "all") return
     const id = setInterval(() => setNow(Date.now()), 60_000)
     return () => clearInterval(id)
-  }, [])
+  }, [dateRange])
 
   const filteredEvents = useMemo(() => {
     let result = selectedProjectId === "all" ? events : events.filter(e => e.project_id === selectedProjectId)
 
     if (dateRange !== "all") {
-      const cutoff = new Date(now - DATE_RANGE_HOURS[dateRange as Exclude<DateRange, "all">] * 60 * 60 * 1000)
-      result = result.filter(e => new Date(e.created_at) >= cutoff)
+      const cutoffMs = now - DATE_RANGE_HOURS[dateRange as Exclude<DateRange, "all">] * 60 * 60 * 1000
+      result = result.filter(e => Date.parse(e.created_at) >= cutoffMs)
     }
 
     return result
