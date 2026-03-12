@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { syncMetals } from "@/lib/sync-metals"
 
+// Manual sync from the Settings UI is handled via a Next.js server action (app/actions/sync-metals.ts).
 // GET — triggered by Vercel Cron (includes Authorization header with CRON_SECRET)
 export async function GET(request: Request) {
   const cronSecret = process.env.CRON_SECRET

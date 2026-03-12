@@ -1,6 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin"
-
-const METALS_PROJECT_NAME = "Metals Tracker"
+import { METALS_PROJECT_NAME } from "@/lib/constants"
 const SYMBOLS = ["XAU", "XAG", "XPT", "XPD"]
 
 const SYMBOL_META: Record<string, { name: string; icon: string; channel: string }> = {

@@ -7,12 +7,13 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { LineChart, Line, XAxis, YAxis } from "recharts"
 import { TrendingUp, TrendingDown } from "lucide-react"
 import { format, subHours } from "date-fns"
+import { getChannelColor } from "@/lib/channel-colors"
 
 const METALS = [
-  { channel: "gold",      symbol: "XAU", name: "Gold",      icon: "🥇", color: "#f59e0b" },
-  { channel: "silver",    symbol: "XAG", name: "Silver",    icon: "🥈", color: "#94a3b8" },
-  { channel: "platinum",  symbol: "XPT", name: "Platinum",  icon: "⬜", color: "#6366f1" },
-  { channel: "palladium", symbol: "XPD", name: "Palladium", icon: "🔘", color: "#a78bfa" },
+  { channel: "gold",      symbol: "XAU", name: "Gold",      icon: "🥇" },
+  { channel: "silver",    symbol: "XAG", name: "Silver",    icon: "🥈" },
+  { channel: "platinum",  symbol: "XPT", name: "Platinum",  icon: "⬜" },
+  { channel: "palladium", symbol: "XPD", name: "Palladium", icon: "🔘" },
 ]
 
 function parsePrice(description: string | null): number | null {
@@ -112,8 +113,9 @@ export function MetalsPriceChart({ events, hasProject }: MetalsPriceChartProps) 
       {/* Price charts — 2×2 grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {metalData.map((metal) => {
+          const color = getChannelColor(metal.channel)
           const chartConfig = {
-            price: { label: `${metal.name} (USD/oz)`, color: metal.color },
+            price: { label: `${metal.name} (USD/oz)`, color },
           }
 
           if (metal.chartData.length === 0) {
@@ -174,7 +176,7 @@ export function MetalsPriceChart({ events, hasProject }: MetalsPriceChartProps) 
                     <Line
                       type="monotone"
                       dataKey="price"
-                      stroke={metal.color}
+                      stroke={color}
                       strokeWidth={2}
                       dot={metal.chartData.length <= 20}
                       activeDot={{ r: 4 }}

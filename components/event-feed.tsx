@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import type { Event } from "@/lib/types"
 import { EventCard } from "@/components/event-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -31,10 +31,11 @@ export function EventFeed({
 }: EventFeedProps) {
   const [events, setEvents] = useState<Event[]>(initialEvents)
   const [searchQuery, setSearchQuery] = useState("")
+  const deletedIdsRef = useRef<Set<string>>(new Set())
 
-  // Sync local state when the parent project filter changes
+  // Sync local state when the parent project filter changes, preserving local deletions
   useEffect(() => {
-    setEvents(initialEvents)
+    setEvents(initialEvents.filter(e => !deletedIdsRef.current.has(e.id)))
   }, [initialEvents])
   const [selectedChannel, setSelectedChannel] = useState<string>("all")
   const [pageSize, setPageSize] = useState<string>("50")
@@ -109,6 +110,7 @@ export function EventFeed({
 
   // Handle event deletion
   const handleDeleteEvent = (eventId: string) => {
+    deletedIdsRef.current.add(eventId)
     setEvents((prev) => prev.filter((e) => e.id !== eventId))
   }
 
