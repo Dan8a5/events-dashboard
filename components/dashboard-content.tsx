@@ -7,7 +7,14 @@ import { ActivityChart } from "@/components/activity-chart"
 import { KpiCards } from "@/components/kpi-cards"
 import { ChannelBreakdownChart } from "@/components/channel-breakdown-chart"
 import { ProjectSelector } from "@/components/project-selector"
+import { DateRangeFilter, type DateRange } from "@/components/date-range-filter"
 import { createClient } from "@/lib/supabase/client"
+
+const DATE_RANGE_HOURS: Record<Exclude<DateRange, "all">, number> = {
+  "24h": 24,
+  "7d": 7 * 24,
+  "30d": 30 * 24,
+}
 
 interface DashboardContentProps {
   initialEvents: Event[]
@@ -15,14 +22,16 @@ interface DashboardContentProps {
   projects: Project[]
 }
 
-export function DashboardContent({ 
-  initialEvents, 
-  channels: initialChannels, 
-  projects 
+export function DashboardContent({
+  initialEvents,
+  channels: initialChannels,
+  projects
 }: DashboardContentProps) {
   const [events, setEvents] = useState<Event[]>(initialEvents)
   const [channels, setChannels] = useState<string[]>(initialChannels)
   const [selectedProjectId, setSelectedProjectId] = useState<string>("all")
+  const [dateRange, setDateRange] = useState<DateRange>("all")
+  const [now, setNow] = useState(() => Date.now())
 
   // Set up real-time subscription for KPI updates
   useEffect(() => {
@@ -40,7 +49,7 @@ export function DashboardContent({
         (payload) => {
           const newEvent = payload.new as Event
           setEvents((prev) => [newEvent, ...prev])
-          
+
           // Update channels if new channel
           if (!channels.includes(newEvent.channel)) {
             setChannels((prev) => [...prev, newEvent.channel].sort())
@@ -54,11 +63,23 @@ export function DashboardContent({
     }
   }, [channels])
 
-  // Filter events by selected project
+  // Tick every minute so date-range cutoffs stay current for non-"all" ranges
+  useEffect(() => {
+    if (dateRange === "all") return
+    const id = setInterval(() => setNow(Date.now()), 60_000)
+    return () => clearInterval(id)
+  }, [dateRange])
+
   const filteredEvents = useMemo(() => {
-    if (selectedProjectId === "all") return events
-    return events.filter(e => e.project_id === selectedProjectId)
-  }, [events, selectedProjectId])
+    let result = selectedProjectId === "all" ? events : events.filter(e => e.project_id === selectedProjectId)
+
+    if (dateRange !== "all") {
+      const cutoffMs = now - DATE_RANGE_HOURS[dateRange as Exclude<DateRange, "all">] * 60 * 60 * 1000
+      result = result.filter(e => Date.parse(e.created_at) >= cutoffMs)
+    }
+
+    return result
+  }, [events, selectedProjectId, dateRange, now])
 
   // Get channels for filtered events
   const filteredChannels = useMemo(() => {
@@ -76,21 +97,23 @@ export function DashboardContent({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <ProjectSelector 
+        <ProjectSelector
           projects={projects}
           selectedProjectId={selectedProjectId}
           onProjectChange={setSelectedProjectId}
         />
-        {selectedProjectId !== "all" && (
-          <p className="text-sm text-muted-foreground">
-            Showing events from {projects.find(p => p.id === selectedProjectId)?.name}
-          </p>
-        )}
+        <DateRangeFilter value={dateRange} onChange={setDateRange} />
       </div>
-      
+      {selectedProjectId !== "all" && (
+        <p className="text-sm text-muted-foreground">
+          Showing events from {projects.find(p => p.id === selectedProjectId)?.name}
+        </p>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
-        <EventFeed 
-          initialEvents={filteredEvents} 
+        <EventFeed
+          key={`${selectedProjectId}-${dateRange}`}
+          initialEvents={filteredEvents}
           channels={filteredChannels}
           projectMap={projectMap}
           showProject={selectedProjectId === "all"}
